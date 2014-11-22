@@ -17,6 +17,8 @@ New python executable in django-ifqsync2/bin/python3
 Also creating executable in django-ifqsync2/bin/python
 Installing setuptools, pip...done.
 
+$ workon django-ifqsync2
+
 $ python -V
 Python 3.4.2
 
@@ -47,6 +49,8 @@ $ export IFQ_PASSWORD="password"
 ```bash
 
 $ cd ifqsync2 
+
+$ python manage.py migrate
 
 $ python manage.py runserver
 
