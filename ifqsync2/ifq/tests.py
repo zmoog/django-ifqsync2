@@ -4,6 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from .client import Client
 
 import os
+from datetime import date
 
 
 def get_env_variable(var_name):
@@ -16,17 +17,52 @@ def get_env_variable(var_name):
 
 
 class ClientTest(TestCase):
-	"""
-	Test the IFQ client operations
-	"""
+    """
+    Test the IFQ client operations
+    """
 
-	def test_login_on_the_website(self):
+    def setUp(self):
 
-		client = Client(username=get_env_variable('IFQ_USERNAME'), password=get_env_variable('IFQ_PASSWORD'))
+        self.client = Client(username=get_env_variable('IFQ_USERNAME'), password=get_env_variable('IFQ_PASSWORD'))
 
-		self.assertFalse(client.is_logged())
 
-		client.login()
+    def tearDown(self):
+        # TODO: logout maybe?
+        self.client = None       
 
-		self.assertTrue(client.is_logged())
+
+    def test_login_on_the_website(self):
+
+        self.assertFalse(self.client.is_logged())
+
+        self.client.login()
+
+        self.assertTrue(self.client.is_logged())
     
+
+    def test_search_for_existing_issue(self):
+        """
+        """
+
+        self.client.login()
+
+        result = self.client.exists_issue(pub_date=date(2014, 11, 23))
+
+        self.assertIsNotNone(result)
+        
+        self.assertTrue(result)
+
+
+    def test_search_for_a_not_existing_issue(self):
+        """
+        """
+
+        self.client.login()
+
+        result = self.client.exists_issue(pub_date=date(2001, 9, 11))
+
+        self.assertIsNotNone(result)
+        
+        self.assertFalse(result)
+
+
