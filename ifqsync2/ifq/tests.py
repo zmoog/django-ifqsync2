@@ -40,6 +40,19 @@ class ClientTest(TestCase):
         self.assertTrue(self.client.is_logged())
     
 
+    def test_logout_from_the_website(self):
+        
+        self.assertFalse(self.client.is_logged())
+
+        self.client.login()
+
+        self.assertTrue(self.client.is_logged())
+
+        self.client.logout()
+
+        self.assertFalse(self.client.is_logged())
+
+
     def test_search_for_existing_issue(self):
         """
         """
@@ -64,5 +77,12 @@ class ClientTest(TestCase):
         self.assertIsNotNone(result)
         
         self.assertFalse(result)
+
+
+    def test_download_issue(self):
+        
+        self.client.login()
+
+        file_path = self.client.download(pub_date=date(2014, 11, 6)) # 4,1 MB PDF file
 
 
