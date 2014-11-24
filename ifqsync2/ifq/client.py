@@ -11,7 +11,6 @@ URL_DOWNLOAD = 'http://pdf.ilfattoquotidiano.it/openpdf/?n=%Y%m%d'
 
 CANARY_COOKIE = 'disqus-sso-email' # or 'wordpress_logged_in'
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -82,8 +81,8 @@ class Client(object):
 
         response = self._session.get(search_url)
 
-        print('download_url: %s' % (download_url))
-        print('response.text: %s' % (response.text))
+        logger.info('download_url: %s' % download_url)
+        logger.info('response.text: %s' % response.text)
 
         if response.status_code == 200 and download_url in response.text:
             return True
@@ -100,15 +99,14 @@ class Client(object):
 
         download_url = self._build_download_url(pub_date)
 
-        logger.info('download_url: %s' % (download_url))
-        print('download_url: %s' % (download_url))
+        logger.info('download_url: %s' % download_url)
 
         response = self._session.get(download_url, stream=True)
 
         assert(response.headers['Content-Type'] == 'application/pdf')
 
 
-        print('headers: %s' % (response.headers))
+        logger.info('headers: %s' % (response.headers))
 
         assert(response.status_code == 200)
 

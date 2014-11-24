@@ -63,7 +63,7 @@ class ClientTest(TestCase):
 
         self.assertIsNotNone(result)
         
-        self.assertTrue(result)
+        self.assertIs(result, True)
 
 
     def test_search_for_a_not_existing_issue(self):
@@ -76,7 +76,7 @@ class ClientTest(TestCase):
 
         self.assertIsNotNone(result)
         
-        self.assertFalse(result)
+        self.assertIs(result, False)
 
 
     def test_download_issue(self):
