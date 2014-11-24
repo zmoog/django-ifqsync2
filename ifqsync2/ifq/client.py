@@ -3,6 +3,7 @@
 import requests
 import os
 import logging
+import tempfile
 
 URL_LOGIN = 'https://shop.ilfattoquotidiano.it/login/?action=login'
 URL_LOGOUT = 'http://www.ilfattoquotidiano.it/logout/'
@@ -80,9 +81,7 @@ class Client(object):
         download_url = self._build_download_url(pub_date)
 
         response = self._session.get(search_url)
-
-        logger.info('download_url: %s' % download_url)
-        logger.info('response.text: %s' % response.text)
+        logger.debug('response.text: %s' % response.text)
 
         if response.status_code == 200 and download_url in response.text:
             return True
@@ -93,22 +92,18 @@ class Client(object):
 
     def download(self, pub_date):
         """
+        Download the PDF file into a temp dir and return the local path 
+        to that file.
         """
-
-        import tempfile
 
         download_url = self._build_download_url(pub_date)
 
-        logger.info('download_url: %s' % download_url)
-
         response = self._session.get(download_url, stream=True)
+        logger.debug('headers: %s' % (response.headers))
 
-        assert(response.headers['Content-Type'] == 'application/pdf')
-
-
-        logger.info('headers: %s' % (response.headers))
-
+        # the request must be successful and contain a PDF file.
         assert(response.status_code == 200)
+        assert(response.headers['Content-Type'] == 'application/pdf')
 
         local_filename = os.path.join(tempfile.gettempdir(), pub_date.strftime('ifq-%Y%m%d.pdf'))
 
@@ -118,7 +113,8 @@ class Client(object):
                     f.write(chunk)
                     f.flush()
 
-
+        # check the size of the downloaded file against the content length 
+        # declared in the HTTP header.
         assert(os.path.getsize(local_filename) == int(response.headers['Content-Length']))
 
         return local_filename
@@ -126,7 +122,11 @@ class Client(object):
 
 
     def _build_search_url(self, pub_date):
-        return pub_date.strftime(URL_SEARCH)
+        search_url = pub_date.strftime(URL_SEARCH)
+        logger.debug('search_url: %s' % search_url)
+        return search_url
 
     def _build_download_url(self, pub_date):
-        return pub_date.strftime(URL_DOWNLOAD)
+        download_url = pub_date.strftime(URL_DOWNLOAD)
+        logger.debug('download_url: %s' % download_url)
+        return download_url

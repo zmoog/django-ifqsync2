@@ -23,7 +23,10 @@ class ClientTest(TestCase):
 
     def setUp(self):
 
-        self.client = Client(username=get_env_variable('IFQ_USERNAME'), password=get_env_variable('IFQ_PASSWORD'))
+        self.client = Client(
+            username=get_env_variable('IFQ_USERNAME'), 
+            password=get_env_variable('IFQ_PASSWORD')
+        )
 
 
     def tearDown(self):
@@ -33,24 +36,24 @@ class ClientTest(TestCase):
 
     def test_login_on_the_website(self):
 
-        self.assertFalse(self.client.is_logged())
+        self.assertIs(self.client.is_logged(), False)
 
         self.client.login()
 
-        self.assertTrue(self.client.is_logged())
+        self.assertIs(self.client.is_logged(), True)
     
 
     def test_logout_from_the_website(self):
         
-        self.assertFalse(self.client.is_logged())
+        self.assertIs(self.client.is_logged(), False)
 
         self.client.login()
 
-        self.assertTrue(self.client.is_logged())
+        self.assertIs(self.client.is_logged(), True)
 
         self.client.logout()
 
-        self.assertFalse(self.client.is_logged())
+        self.assertIs(self.client.is_logged(), False)
 
 
     def test_search_for_existing_issue(self):
@@ -85,4 +88,7 @@ class ClientTest(TestCase):
 
         file_path = self.client.download(pub_date=date(2014, 11, 6)) # 4,1 MB PDF file
 
+        self.assertTrue(os.path.isfile(file_path))
+
+        self.assertEqual(os.path.getsize(file_path), 4303574)
 
